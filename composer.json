@@ -1,0 +1,17 @@
+{
+    "name": "tahae/clientflow-api",
+    "autoload": {
+        "psr-4": {
+            "Tahae\\ClientflowApi\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "taha",
+            "email": "tahaelkhayyam1@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
