@@ -51,16 +51,23 @@ class ClientController
     {
         header("Content-Type: application/json");
 
-        // Protected route
         AuthMiddleware::verifyToken();
 
-        $clientModel = new Client();
+        $search = $_GET['search'] ?? null;
+        $page = $_GET['page'] ?? 1;
+        $limit = $_GET['limit'] ?? 10;
 
-        $clients = $clientModel->getAll();
+        $offset = ($page - 1) * $limit;
+
+        $client = new Client();
+
+        $data = $client->getAll($search, $limit, $offset);
 
         echo json_encode([
             "status" => "success",
-            "data" => $clients
+            "page" => (int)$page,
+            "limit" => (int)$limit,
+            "data" => $data
         ]);
     }
 

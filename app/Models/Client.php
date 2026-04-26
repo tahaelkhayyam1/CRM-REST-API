@@ -44,12 +44,25 @@ class Client
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    public function getAll()
+    public function getAll($search = null, $limit = 10, $offset = 0)
     {
-        $sql = "SELECT * FROM {$this->table}
-            ORDER BY id DESC";
+        $sql = "SELECT * FROM {$this->table} WHERE 1";
+
+        if ($search) {
+            $sql .= " AND (name LIKE :search OR email LIKE :search OR company LIKE :search)";
+        }
+
+        $sql .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
 
         $stmt = $this->conn->prepare($sql);
+
+        if ($search) {
+            $stmt->bindValue(':search', "%$search%");
+        }
+
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
