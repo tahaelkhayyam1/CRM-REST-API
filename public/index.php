@@ -2,11 +2,22 @@
 
 header("Content-Type: application/json");
 
-require_once __DIR__ . '/../app/Core/Router.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-require_once __DIR__ . '/../app/Controllers/AuthController.php';
-require_once __DIR__ . '/../app/Controllers/ClientController.php';
+use App\Core\Router;
+use App\Controllers\AuthController;
+use App\Controllers\ClientController;
 
+
+
+
+
+ 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
+// THEN router
+ 
 $auth = new AuthController();
 $client = new ClientController();
 

@@ -1,7 +1,7 @@
 <?php
-
-require_once __DIR__ . '/../../config/Database.php';
-
+namespace App\Models;
+use App\Config\Database;
+use PDO;
 class Client
 {
     private $conn;

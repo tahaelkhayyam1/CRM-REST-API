@@ -1,7 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../Models/User.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+namespace App\Controllers;
+
+use App\Models\User;
+use App\Middleware\AuthMiddleware;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -128,8 +130,4 @@ class AuthController
             "user" => $user
         ]);
     }
-
-
-
-
-    }
+}

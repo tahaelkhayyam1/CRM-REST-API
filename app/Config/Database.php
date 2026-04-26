@@ -1,9 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace App\Config;
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+use PDO;
+use PDOException;
+use Dotenv\Dotenv;
+
+ 
 
 class Database
 {
@@ -12,13 +15,13 @@ class Database
     private $username;
     private $password;
 
-    public function __construct()
-    {
-        $this->host = $_ENV['DB_HOST'];
-        $this->dbname = $_ENV['DB_NAME'];
-        $this->username = $_ENV['DB_USER'];
-        $this->password = $_ENV['DB_PASS'];
-    }
+  public function __construct()
+{
+    $this->host = $_ENV['DB_HOST'] ?? 'localhost';
+    $this->dbname = $_ENV['DB_NAME'] ?? 'clientflow_api';
+    $this->username = $_ENV['DB_USER'] ?? 'root';
+    $this->password = $_ENV['DB_PASS'] ?? '';
+}
 
     public function connect()
     {

@@ -1,5 +1,5 @@
 <?php
-
+namespace App\Validators;
 class ClientValidator
 {
     public static function validateCreate($data)

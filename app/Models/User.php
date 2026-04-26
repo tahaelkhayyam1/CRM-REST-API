@@ -1,7 +1,8 @@
 <?php
 
-require_once __DIR__ . '/../../config/Database.php';
-
+namespace App\Models;
+use App\Config\Database;
+use PDO;
 class User
 {
     private $conn;
@@ -38,6 +39,4 @@ class User
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
- 
 }

@@ -1,10 +1,13 @@
 <?php
 
-require_once __DIR__ . '/../Models/Client.php';
-require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
-require_once __DIR__ . '/../Validators/ClientValidator.php';
-require_once __DIR__ . '/../Helpers/Response.php';
-require_once __DIR__ . '/../Core/Router.php';
+namespace App\Controllers;
+
+use App\Models\Client;
+use App\Middleware\AuthMiddleware;
+use App\Validators\ClientValidator;
+use App\Helpers\Response;
+ 
+
 class ClientController
 {
     public function store()
