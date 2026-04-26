@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../Models/Client.php';
 require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
-
+require_once __DIR__ . '/../Validators/ClientValidator.php';
 class ClientController
 {
     public function store()
@@ -14,17 +14,15 @@ class ClientController
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (
-            empty($data['name']) ||
-            empty($data['email'])
-        ) {
+        $errors = ClientValidator::validateCreate($data);
+
+        if (!empty($errors)) {
             echo json_encode([
                 "status" => "error",
-                "message" => "Name and email are required"
+                "errors" => $errors
             ]);
             return;
         }
-
         $clientModel = new Client();
 
         if ($clientModel->findByEmail($data['email'])) {
@@ -74,10 +72,12 @@ class ClientController
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (empty($data['name']) || empty($data['email'])) {
+        $errors = ClientValidator::validateUpdate($data);
+
+        if (!empty($errors)) {
             echo json_encode([
                 "status" => "error",
-                "message" => "Name and email are required"
+                "errors" => $errors
             ]);
             return;
         }
