@@ -3,6 +3,8 @@
 require_once __DIR__ . '/../Models/Client.php';
 require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../Validators/ClientValidator.php';
+require_once __DIR__ . '/../Helpers/Response.php';
+require_once __DIR__ . '/../Core/Router.php';
 class ClientController
 {
     public function store()
@@ -10,27 +12,18 @@ class ClientController
         header("Content-Type: application/json");
 
         // JWT protection
-        AuthMiddleware::verifyToken();
-
+        AuthMiddleware::requireRole(['admin', 'employee']);
         $data = json_decode(file_get_contents("php://input"), true);
 
         $errors = ClientValidator::validateCreate($data);
 
         if (!empty($errors)) {
-            echo json_encode([
-                "status" => "error",
-                "errors" => $errors
-            ]);
-            return;
+            Response::error($errors);
         }
         $clientModel = new Client();
 
         if ($clientModel->findByEmail($data['email'])) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Client email already exists"
-            ]);
-            return;
+            Response::error("Client email already exists");
         }
 
         $clientModel->create(
@@ -41,10 +34,7 @@ class ClientController
             $data['status'] ?? 'active'
         );
 
-        echo json_encode([
-            "status" => "success",
-            "message" => "Client created successfully"
-        ]);
+        Response::success("Client created successfully");
     }
 
     public function index()
@@ -75,18 +65,14 @@ class ClientController
     {
         header("Content-Type: application/json");
 
-        AuthMiddleware::verifyToken();
+        AuthMiddleware::requireRole(['admin']);
 
         $data = json_decode(file_get_contents("php://input"), true);
 
         $errors = ClientValidator::validateUpdate($data);
 
         if (!empty($errors)) {
-            echo json_encode([
-                "status" => "error",
-                "errors" => $errors
-            ]);
-            return;
+            Response::error($errors);
         }
 
         $client = new Client();
@@ -100,26 +86,18 @@ class ClientController
             $data['status'] ?? 'active'
         );
 
-        echo json_encode([
-            "status" => "success",
-            "message" => "Client updated successfully"
-        ]);
+        Response::success("Client updated successfully");
     }
 
 
 
     public function delete($id)
     {
-        header("Content-Type: application/json");
-
-        AuthMiddleware::verifyToken();
+        AuthMiddleware::requireRole(['admin']);
 
         $client = new Client();
         $client->delete($id);
 
-        echo json_encode([
-            "status" => "success",
-            "message" => "Client deleted successfully"
-        ]);
+        Response::success("Client deleted successfully");
     }
 }

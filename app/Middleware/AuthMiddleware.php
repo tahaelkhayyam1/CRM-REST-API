@@ -47,4 +47,19 @@ class AuthMiddleware
             exit;
         }
     }
+
+    public static function requireRole($allowedRoles)
+{
+    $user = self::verifyToken();
+
+    if (!in_array($user->role, $allowedRoles)) {
+        echo json_encode([
+            "status" => "error",
+            "message" => "Access denied"
+        ]);
+        exit;
+    }
+
+    return $user;
+}
 }
