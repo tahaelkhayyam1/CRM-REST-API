@@ -48,4 +48,71 @@ class ClientController
             "message" => "Client created successfully"
         ]);
     }
+
+    public function index()
+    {
+        header("Content-Type: application/json");
+
+        // Protected route
+        AuthMiddleware::verifyToken();
+
+        $clientModel = new Client();
+
+        $clients = $clientModel->getAll();
+
+        echo json_encode([
+            "status" => "success",
+            "data" => $clients
+        ]);
+    }
+
+    public function update($id)
+    {
+        header("Content-Type: application/json");
+
+        AuthMiddleware::verifyToken();
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (empty($data['name']) || empty($data['email'])) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Name and email are required"
+            ]);
+            return;
+        }
+
+        $client = new Client();
+
+        $client->update(
+            $id,
+            $data['name'],
+            $data['email'],
+            $data['phone'] ?? null,
+            $data['company'] ?? null,
+            $data['status'] ?? 'active'
+        );
+
+        echo json_encode([
+            "status" => "success",
+            "message" => "Client updated successfully"
+        ]);
+    }
+
+
+
+    public function delete($id)
+    {
+        header("Content-Type: application/json");
+
+        AuthMiddleware::verifyToken();
+
+        $client = new Client();
+        $client->delete($id);
+
+        echo json_encode([
+            "status" => "success",
+            "message" => "Client deleted successfully"
+        ]);
+    }
 }

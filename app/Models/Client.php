@@ -44,4 +44,48 @@ class Client
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    public function getAll()
+    {
+        $sql = "SELECT * FROM {$this->table}
+            ORDER BY id DESC";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function update($id, $name, $email, $phone, $company, $status)
+    {
+        $sql = "UPDATE {$this->table}
+            SET name = :name,
+                email = :email,
+                phone = :phone,
+                company = :company,
+                status = :status
+            WHERE id = :id";
+
+        $stmt = $this->conn->prepare($sql);
+
+        return $stmt->execute([
+            ":id" => $id,
+            ":name" => $name,
+            ":email" => $email,
+            ":phone" => $phone,
+            ":company" => $company,
+            ":status" => $status
+        ]);
+    }
+
+
+    public function delete($id)
+    {
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
+
+        $stmt = $this->conn->prepare($sql);
+
+        return $stmt->execute([
+            ":id" => $id
+        ]);
+    }
 }

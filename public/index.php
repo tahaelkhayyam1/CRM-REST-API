@@ -21,6 +21,15 @@ $route = str_replace($basePath, '', $uri);
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+
+$clientId = null;
+
+// Detect /clients/{id}
+if (preg_match('#^/clients/(\d+)$#', $route, $matches)) {
+    $clientId = $matches[1];
+    $route = '/clients/{id}';
+}
+
 switch ($route) {
 
     case '/register':
@@ -43,10 +52,32 @@ switch ($route) {
         }
         break;
     case '/clients':
+
         if ($method === 'POST') {
             $client->store();
             exit;
         }
+
+        if ($method === 'GET') {
+            $client->index();
+            exit;
+        }
+
+        break;
+
+
+    case '/clients/{id}':
+
+        if ($method === 'PUT') {
+            $client->update($clientId);
+            exit;
+        }
+
+        if ($method === 'DELETE') {
+            $client->delete($clientId);
+            exit;
+        }
+
         break;
     default:
         echo json_encode([
