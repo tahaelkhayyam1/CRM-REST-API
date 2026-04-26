@@ -1,6 +1,10 @@
 <?php
 
 require_once __DIR__ . '/../Models/User.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class AuthController
 {
@@ -54,7 +58,7 @@ class AuthController
     }
 
 
-       public function login()
+    public function login()
     {
         header("Content-Type: application/json");
 
@@ -91,15 +95,24 @@ class AuthController
             return;
         }
 
+        $payload = [
+            "id" => $user['id'],
+            "email" => $user['email'],
+            "role" => $user['role'],
+            "iat" => time(),
+            "exp" => time() + 3600
+        ];
+
+        $token = JWT::encode(
+            $payload,
+            $_ENV['JWT_SECRET'],
+            'HS256'
+        );
+
         echo json_encode([
             "status" => "success",
             "message" => "Login successful",
-            "user" => [
-                "id" => $user['id'],
-                "name" => $user['name'],
-                "email" => $user['email'],
-                "role" => $user['role']
-            ]
+            "token" => $token
         ]);
     }
 }
