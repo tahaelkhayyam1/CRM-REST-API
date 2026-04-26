@@ -115,4 +115,17 @@ class AuthController
             "token" => $token
         ]);
     }
+
+    public function profile()
+    {
+        require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
+
+        $user = AuthMiddleware::verifyToken();
+
+        echo json_encode([
+            "status" => "success",
+            "message" => "Protected route accessed",
+            "user" => $user
+        ]);
+    }
 }

@@ -34,7 +34,12 @@ switch ($route) {
             exit;
         }
         break;
-
+    case '/profile':
+        if ($method === 'GET') {
+            $auth->profile();
+            exit;
+        }
+        break;
     default:
         echo json_encode([
             "status" => "error",
