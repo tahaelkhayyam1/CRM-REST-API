@@ -3,9 +3,11 @@
 header("Content-Type: application/json");
 
 require_once __DIR__ . '/../app/Controllers/AuthController.php';
+require_once __DIR__ . '/../app/Controllers/ClientController.php';
+
 
 $auth = new AuthController();
-
+$client = new ClientController();
 /**
  * Get clean route
  */
@@ -37,6 +39,12 @@ switch ($route) {
     case '/profile':
         if ($method === 'GET') {
             $auth->profile();
+            exit;
+        }
+        break;
+    case '/clients':
+        if ($method === 'POST') {
+            $client->store();
             exit;
         }
         break;

@@ -1,0 +1,51 @@
+<?php
+
+require_once __DIR__ . '/../Models/Client.php';
+require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
+
+class ClientController
+{
+    public function store()
+    {
+        header("Content-Type: application/json");
+
+        // JWT protection
+        AuthMiddleware::verifyToken();
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (
+            empty($data['name']) ||
+            empty($data['email'])
+        ) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Name and email are required"
+            ]);
+            return;
+        }
+
+        $clientModel = new Client();
+
+        if ($clientModel->findByEmail($data['email'])) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Client email already exists"
+            ]);
+            return;
+        }
+
+        $clientModel->create(
+            $data['name'],
+            $data['email'],
+            $data['phone'] ?? null,
+            $data['company'] ?? null,
+            $data['status'] ?? 'active'
+        );
+
+        echo json_encode([
+            "status" => "success",
+            "message" => "Client created successfully"
+        ]);
+    }
+}
