@@ -1,53 +1,88 @@
 <?php
 
-header("Content-Type: application/json");
-
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Core\Router;
-use App\Controllers\AuthController;
-use App\Controllers\ClientController;
+use App\Controllers\Web\AuthController;
 
+session_start();
 
-
-
-
- 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-
-// THEN router
- 
+/*
+|------------------------
+| CONTROLLER
+|------------------------
+*/
 $auth = new AuthController();
-$client = new ClientController();
-
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$base = '/clientflow-api/public';
-
-$route = str_replace($base, '', $uri);
 
 /*
-|----------------------------------
-| AUTH ROUTES
-|----------------------------------
+|------------------------
+| ROUTING INPUT
+|------------------------
 */
-Router::post('/register', [$auth, 'register']);
-Router::post('/login', [$auth, 'login']);
-Router::get('/profile', [$auth, 'profile']);
+$page = $_GET['page'] ?? 'login';
+$action = $_GET['action'] ?? null;
 
 /*
-|----------------------------------
-| CLIENT ROUTES
-|----------------------------------
+|------------------------
+| ACTIONS (POST LOGIC)
+|------------------------
 */
-Router::get('/clients', [$client, 'index']);
-Router::post('/clients', [$client, 'store']);
-Router::put('/clients/{id}', [$client, 'update']);
-Router::delete('/clients/{id}', [$client, 'delete']);
+if ($action === 'register') {
+    $auth->register();
+    exit;
+}
 
+if ($action === 'login') {
+    $auth->login();
+    exit;
+}
+if ($action === 'create-client') {
+    $client = new \App\Controllers\Web\ClientController();
+    $client->store();
+    exit;
+}
+if ($action === 'delete-client') {
+    $client = new \App\Controllers\Web\ClientController();
+    $client->delete($_GET['id']);
+    exit;
+}
+
+if ($action === 'update-client') {
+    $client = new \App\Controllers\Web\ClientController();
+    $client->update($_GET['id']);
+    exit;
+}
+
+
+if ($action === 'logout') {
+    $auth->logout();
+    exit;
+}
 /*
-|----------------------------------
-| RUN ROUTER
-|----------------------------------
+|------------------------
+| VIEWS ROUTING
+|------------------------
 */
-Router::resolve($route, $_SERVER['REQUEST_METHOD']);
+switch ($page) {
+
+    case 'login':
+        require_once __DIR__ . '/../views/auth/login.php';
+        break;
+
+    case 'register':
+        require_once __DIR__ . '/../views/auth/register.php';
+        break;
+
+    case 'clients':
+        require_once __DIR__ . '/../views/clients/index.php';
+        break;
+
+    case 'create-client':
+        require_once __DIR__ . '/../views/clients/create.php';
+        break;
+
+    case 'edit-client':
+        require_once __DIR__ . '/../views/clients/edit.php';
+        break;
+    default:
+        echo "404 - Page not found";
+}

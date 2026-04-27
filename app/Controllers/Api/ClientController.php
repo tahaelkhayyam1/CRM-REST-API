@@ -1,49 +1,16 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Api;
 
+use App\Helpers\Response;
 use App\Models\Client;
 use App\Middleware\AuthMiddleware;
 use App\Validators\ClientValidator;
-use App\Helpers\Response;
- 
 
 class ClientController
 {
-    public function store()
-    {
-        header("Content-Type: application/json");
-
-        // JWT protection
-        AuthMiddleware::requireRole(['admin', 'employee']);
-        $data = json_decode(file_get_contents("php://input"), true);
-
-        $errors = ClientValidator::validateCreate($data);
-
-        if (!empty($errors)) {
-            Response::error($errors);
-        }
-        $clientModel = new Client();
-
-        if ($clientModel->findByEmail($data['email'])) {
-            Response::error("Client email already exists");
-        }
-
-        $clientModel->create(
-            $data['name'],
-            $data['email'],
-            $data['phone'] ?? null,
-            $data['company'] ?? null,
-            $data['status'] ?? 'active'
-        );
-
-        Response::success("Client created successfully");
-    }
-
     public function index()
     {
-        header("Content-Type: application/json");
-
         AuthMiddleware::verifyToken();
 
         $search = $_GET['search'] ?? null;
@@ -53,29 +20,52 @@ class ClientController
         $offset = ($page - 1) * $limit;
 
         $client = new Client();
-
         $data = $client->getAll($search, $limit, $offset);
 
-        echo json_encode([
-            "status" => "success",
+        return Response::success("Clients list", [
             "page" => (int)$page,
             "limit" => (int)$limit,
             "data" => $data
         ]);
     }
 
+    public function store()
+    {
+        AuthMiddleware::requireRole(['admin', 'employee']);
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $errors = ClientValidator::validateCreate($data);
+        if (!empty($errors)) {
+            return Response::error($errors, 422);
+        }
+
+        $client = new Client();
+
+        if ($client->findByEmail($data['email'])) {
+            return Response::error("Client email already exists", 409);
+        }
+
+        $client->create(
+            $data['name'],
+            $data['email'],
+            $data['phone'] ?? null,
+            $data['company'] ?? null,
+            $data['status'] ?? 'active'
+        );
+
+        return Response::success("Client created successfully");
+    }
+
     public function update($id)
     {
-        header("Content-Type: application/json");
-
         AuthMiddleware::requireRole(['admin']);
 
         $data = json_decode(file_get_contents("php://input"), true);
 
         $errors = ClientValidator::validateUpdate($data);
-
         if (!empty($errors)) {
-            Response::error($errors);
+            return Response::error($errors, 422);
         }
 
         $client = new Client();
@@ -89,10 +79,8 @@ class ClientController
             $data['status'] ?? 'active'
         );
 
-        Response::success("Client updated successfully");
+        return Response::success("Client updated successfully");
     }
-
-
 
     public function delete($id)
     {
@@ -101,6 +89,6 @@ class ClientController
         $client = new Client();
         $client->delete($id);
 
-        Response::success("Client deleted successfully");
+        return Response::success("Client deleted successfully");
     }
 }
