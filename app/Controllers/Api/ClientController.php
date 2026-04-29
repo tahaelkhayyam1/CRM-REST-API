@@ -11,7 +11,7 @@ class ClientController
 {
     public function index()
     {
-        AuthMiddleware::verifyToken();
+        AuthMiddleware::requireRole(['admin', 'employee']);
 
         $search = $_GET['search'] ?? null;
         $page = $_GET['page'] ?? 1;

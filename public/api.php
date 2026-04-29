@@ -7,6 +7,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use App\Core\Router;
 use App\Controllers\Api\AuthController as ApiAuthController;
 use App\Controllers\Api\ClientController as ApiClientController;
+use App\Controllers\Api\ProductController as ApiProductController;
 use Dotenv\Dotenv;
 
 /*
@@ -24,6 +25,7 @@ $dotenv->load();
 */
 $auth = new ApiAuthController();
 $client = new ApiClientController();
+$product = new ApiProductController();
 
 /*
 |----------------------------------
@@ -51,6 +53,32 @@ Router::get('/clients', [$client, 'index']);
 Router::post('/clients', [$client, 'store']);
 Router::put('/clients/{id}', [$client, 'update']);
 Router::delete('/clients/{id}', [$client, 'delete']);
+
+
+/*
+|----------------------------------
+| PRODUCT ROUTES (API)
+|----------------------------------
+*/
+Router::get('/products', [$product, 'index']);
+Router::post('/products', [$product, 'store']);
+Router::delete('/products/{id}', [$product, 'delete']);
+Router::put('/products/{id}', [$product, 'update']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 |----------------------------------
